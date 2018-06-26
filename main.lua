@@ -52,6 +52,32 @@ function love.keypressed(key)
             selectedTile = board[y][x + 1]
         end
     end
+
+    if key == 'enter' or key == 'return' then
+        if not highlightedTile then
+            highlightedTile = true
+            highlightedX, highlightedY = selectedTile.gridX, selectedTile.gridY
+        else
+            local tile1 = selectedTile
+            local tile2 = board[highlightedY][highlightedX]
+
+            local tempX, tempY = tile2.x, tile2.y
+            local tempgridX, tempgridY = tile2.gridX, tile2.gridY
+
+            local tempTile = tile1
+            board[tile1.gridY][tile1.gridX] = tile2
+            board[tile2.gridY][tile2.gridX] = tempTile
+
+            tile2.x, tile2.y = tile1.x, tile1.y
+            tile2.gridX, tile2.gridY = tile1.gridX, tile1.gridY
+            tile1.x, tile1.y = tempX, tempY
+            tile1.gridX, tile1.gridY = tempgridX, tempgridY
+
+            highlightedTile = false
+
+            selectedTile = tile2
+        end
+    end
 end
 
 function love.keyboard.wasPressed(key)
@@ -101,6 +127,15 @@ function drawBoard(offsetX, offsetY)
                 tile.x + offsetX, 
                 tile.y + offsetY
             )
+
+            if highlightedTile then
+                if tile.gridX == highlightedX and tile.gridY == highlightedY then
+                    love.graphics.setColor(1, 1, 1, 0.5)
+                    love.graphics.rectangle('fill', tile.x + offsetX, tile.y + offsetY, 32, 32, 4)
+                    love.graphics.setColor(1, 1, 1, 1)
+                end
+            end
+            
             love.graphics.setColor(1, 0, 0, 0.95)
             love.graphics.setLineWidth(4)
             love.graphics.rectangle('line', selectedTile.x + offsetX, selectedTile.y + offsetY, 32, 32, 4)
