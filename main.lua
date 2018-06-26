@@ -9,7 +9,7 @@ function love.load()
     tileQuads = GenerateQuads(tileSprite, TILE_SIZE, TILE_SIZE)
     board = generateBoard()
 
-    highlightedTile = true
+    highlightedTile = false
     highlightedX, highlightedY = 1, 1
     selectedTile = board[1][1]
 
@@ -68,6 +68,11 @@ function love.keypressed(key)
             board[tile1.gridY][tile1.gridX] = tile2
             board[tile2.gridY][tile2.gridX] = tempTile
 
+            Timer.tween(0.2, {
+                [tile2] = {x = tile1.x, y = tile1.y},
+                [tile1] = {x = tempX, y = tempY}
+            })
+
             tile2.x, tile2.y = tile1.x, tile1.y
             tile2.gridX, tile2.gridY = tile1.gridX, tile1.gridY
             tile1.x, tile1.y = tempX, tempY
@@ -85,7 +90,7 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt)
-
+    Timer.update(dt)
 
     love.keyboard.keysPressed = {}
 end
@@ -131,14 +136,14 @@ function drawBoard(offsetX, offsetY)
             if highlightedTile then
                 if tile.gridX == highlightedX and tile.gridY == highlightedY then
                     love.graphics.setColor(1, 1, 1, 0.5)
-                    love.graphics.rectangle('fill', tile.x + offsetX, tile.y + offsetY, 32, 32, 4)
+                    love.graphics.rectangle('fill', tile.x + offsetX, tile.y + offsetY, TILE_SIZE, TILE_SIZE, 4)
                     love.graphics.setColor(1, 1, 1, 1)
                 end
             end
             
             love.graphics.setColor(1, 0, 0, 0.95)
             love.graphics.setLineWidth(4)
-            love.graphics.rectangle('line', selectedTile.x + offsetX, selectedTile.y + offsetY, 32, 32, 4)
+            love.graphics.rectangle('line', selectedTile.x + offsetX, selectedTile.y + offsetY, TILE_SIZE, TILE_SIZE, 4)
             love.graphics.setColor(1, 1, 1, 1)
         end
     end
