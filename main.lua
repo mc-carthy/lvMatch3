@@ -40,7 +40,7 @@ function love.keypressed(key)
             selectedTile = board[y - 1][x]
         end
     elseif key == 'down' then
-        if y < 8 then
+        if y < GRID_Y_SIZE then
             selectedTile = board[y + 1][x]
         end
     elseif key == 'left' then
@@ -48,7 +48,7 @@ function love.keypressed(key)
             selectedTile = board[y][x - 1]
         end
     elseif key == 'right' then
-        if x < 8 then
+        if x < GRID_Y_SIZE then
             selectedTile = board[y][x + 1]
         end
     end
@@ -98,7 +98,7 @@ end
 function love.draw()
     Push:start()
 
-    drawBoard(128, 16)
+    drawBoard((VIRTUAL_WIDTH - (TILE_SIZE * GRID_X_SIZE)) / 2, (VIRTUAL_HEIGHT - (TILE_SIZE * GRID_Y_SIZE)) / 2)
     
     Push:finish()
 end
@@ -106,9 +106,9 @@ end
 function generateBoard()
     local tiles = {}
 
-    for y = 1, 8 do
+    for y = 1, GRID_Y_SIZE do
         table.insert(tiles, {})
-        for x = 1, 8 do
+        for x = 1, GRID_X_SIZE do
             table.insert(tiles[y], {
                 x = (x - 1) * TILE_SIZE,
                 y = (y - 1) * TILE_SIZE,
@@ -123,8 +123,8 @@ function generateBoard()
 end
 
 function drawBoard(offsetX, offsetY)
-    for y = 1, 8 do
-        for x = 1, 8 do
+    for y = 1, GRID_Y_SIZE do
+        for x = 1, GRID_X_SIZE do
             local tile = board[y][x]
             love.graphics.draw(
                 tileSprite, 
