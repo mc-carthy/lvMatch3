@@ -1,15 +1,20 @@
 require ('src.utils.dependencies')
 
+local backgroundImage = love.graphics.newImage('assets/sprites/background.png')
+local backgroundX = 0
+local backgroundScrollSpeed = 80
+
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     math.randomseed(os.time())
 
     stateMachine = StateMachine {
+        ['start'] = function() return StartState() end,
         ['play'] = function() return PlayState() end
     }
 
-    stateMachine:change('play')
+    stateMachine:change('start')
 
     Push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
@@ -39,6 +44,12 @@ end
 function love.update(dt)
     Timer.update(dt)
 
+    backgroundX = backgroundX - backgroundScrollSpeed * dt
+    
+    if backgroundX <= -1024 + VIRTUAL_WIDTH - 4 + 51 then
+        backgroundX = 0
+    end
+
     stateMachine:update(dt)
 
     love.keyboard.keysPressed = {}
@@ -46,6 +57,8 @@ end
 
 function love.draw()
     Push:start()
+
+    love.graphics.draw(backgroundImage, backgroundX, 0)
 
     stateMachine:draw()
 
