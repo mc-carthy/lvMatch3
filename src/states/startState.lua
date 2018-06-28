@@ -44,20 +44,18 @@ function StartState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
-
+    
     if not self.pauseInput then
         if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('down') then
             self.currentMenuItem = self.currentMenuItem == 1 and 2 or 1
-            gSounds['select']:play()
+            sounds['select']:play()
         end
         if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
             if self.currentMenuItem == 1 then
                 Timer.tween(1, {
                     [self] = {transitionAlpha = 255}
                 }):finish(function()
-                    gStateMachine:change('begin-game', {
-                        level = 1
-                    })
+                    stateMachine:change('beginGame')
                     self.colorTimer:remove()
                 end)
             else
@@ -96,7 +94,7 @@ function StartState:drawMatch3Text(y)
     love.graphics.setColor(1, 1, 1, 0.5)
     love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 76, VIRTUAL_HEIGHT / 2 + y - 11, 150, 58, 6)
 
-    love.graphics.setFont(gFonts['large'])
+    love.graphics.setFont(fonts['large'])
     self:drawTextShadow('MATCH 3', VIRTUAL_HEIGHT / 2 + y)
 
     for i = 1, 6 do
@@ -110,7 +108,7 @@ function StartState:drawOptions(y)
     love.graphics.setColor(1, 1, 1, 0.5)
     love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 76, VIRTUAL_HEIGHT / 2 + y, 150, 58, 6)
 
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(fonts['medium'])
     self:drawTextShadow('Start', VIRTUAL_HEIGHT / 2 + y + 8)
     
     if self.currentMenuItem == 1 then

@@ -11,6 +11,7 @@ function love.load()
 
     stateMachine = StateMachine {
         ['start'] = function() return StartState() end,
+        ['beginGame'] = function () return BeginGameState() end,
         ['play'] = function() return PlayState() end
     }
 
@@ -42,8 +43,6 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt)
-    Timer.update(dt)
-
     backgroundX = backgroundX - backgroundScrollSpeed * dt
     
     if backgroundX <= -1024 + VIRTUAL_WIDTH - 4 + 51 then
