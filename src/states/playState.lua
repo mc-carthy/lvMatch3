@@ -65,6 +65,31 @@ function PlayState:enter(params)
     self.scoreGoal = self.level * 1.25 * 1000
 end
 
+function PlayState:calculateMatches()
+    self.highlightedTile = nil
+
+    local matches = self.board:calculateMatches()
+    
+    if matches then
+        sounds['match']:stop()
+        sounds['match']:play()
+
+        for k, match in pairs(matches) do
+            self.score = self.score + #match * 50
+        end
+
+        self.board:removeMatches()
+
+        local tilesToFall = self.board:getFallingTiles()
+
+        Timer.tween(0.25, tilesToFall):finish(function()
+            self:calculateMatches()
+        end)
+    else
+        self.canInput = true
+    end
+end
+
 function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
@@ -110,7 +135,9 @@ function PlayState:update(dt)
                 Timer.tween(0.1, {
                     [self.highlightedTile] = {x = newTile.x, y = newTile.y},
                     [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                })
+                }):finish(function()
+                    self:calculateMatches()
+                end)
 
                 self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
                     self.highlightedTile
