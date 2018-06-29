@@ -52,9 +52,18 @@ function PlayState:init()
     self.rectHighlighted = false
     self.canInput = true
     self.highlightedTile = nil
+    self.score = 0
+    self.timer = 60
 
     Timer.every(0.5, function()
         self.rectHighlighted = not self.rectHighlighted
+    end)
+
+    Timer.every(1, function()
+        self.timer = self.timer - 1
+        if self.timer <= 5 then
+            sounds['clock']:play()
+        end
     end)
 end
 
@@ -172,4 +181,14 @@ function PlayState:draw()
     love.graphics.setLineWidth(4)
     love.graphics.rectangle('line', self.boardHighlightX * 32 + (VIRTUAL_WIDTH - 272),
         self.boardHighlightY * 32 + 16, 32, 32, 4)
+    
+    love.graphics.setColor(0.2, 0.2, 0.2, 0.95)
+    love.graphics.rectangle('fill', 16, 16, 186, 116, 4)
+
+    love.graphics.setColor(0.4, 0.6, 1, 1)
+    love.graphics.setFont(fonts['medium'])
+    love.graphics.printf('Level: ' .. tostring(self.level), 20, 24, 182, 'center')
+    love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')
+    love.graphics.printf('Goal : ' .. tostring(self.scoreGoal), 20, 80, 182, 'center')
+    love.graphics.printf('Timer: ' .. tostring(self.timer), 20, 108, 182, 'center')
 end
