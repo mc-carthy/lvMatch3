@@ -47,13 +47,15 @@ local function drawBoard(offsetX, offsetY)
 end
 
 function PlayState:init()
-    tileSprite = love.graphics.newImage('assets/sprites/match3.png')
-    tileQuads = GenerateQuads(tileSprite, TILE_SIZE, TILE_SIZE)
-    board = generateBoard()
+    self.boardHighlightX = 0
+    self.boardHighlightY = 0
+    self.rectHighlighted = false
+    self.canInput = true
+    self.highlightedTile = nil
 
-    highlightedTile = false
-    highlightedX, highlightedY = 1, 1
-    selectedTile = board[1][1]
+    Timer.every(0.5, function()
+        self.rectHighlighted = not self.rectHighlighted
+    end)
 end
 
 function PlayState:enter(params)
@@ -64,58 +66,83 @@ function PlayState:enter(params)
 end
 
 function PlayState:update(dt)
-    local x, y = selectedTile.gridX, selectedTile.gridY
-    
-    if love.keyboard.wasPressed('up') then
-        if y > 1 then
-            selectedTile = board[y - 1][x]
-        end
-    elseif love.keyboard.wasPressed('down') then
-        if y < GRID_Y_SIZE then
-            selectedTile = board[y + 1][x]
-        end
-    elseif love.keyboard.wasPressed('left') then
-        if x > 1 then
-            selectedTile = board[y][x - 1]
-        end
-    elseif love.keyboard.wasPressed('right') then
-        if x < GRID_Y_SIZE then
-            selectedTile = board[y][x + 1]
-        end
+    if love.keyboard.wasPressed('escape') then
+        love.event.quit()
     end
 
-    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        if not highlightedTile then
-            highlightedTile = true
-            highlightedX, highlightedY = selectedTile.gridX, selectedTile.gridY
-        else
-            local tile1 = selectedTile
-            local tile2 = board[highlightedY][highlightedX]
+    if self.canInput then
+        if love.keyboard.wasPressed('up') then
+            self.boardHighlightY = math.max(0, self.boardHighlightY - 1)
+            sounds['select']:play()
+        elseif love.keyboard.wasPressed('down') then
+            self.boardHighlightY = math.min(7, self.boardHighlightY + 1)
+            sounds['select']:play()
+        elseif love.keyboard.wasPressed('left') then
+            self.boardHighlightX = math.max(0, self.boardHighlightX - 1)
+            sounds['select']:play()
+        elseif love.keyboard.wasPressed('right') then
+            self.boardHighlightX = math.min(7, self.boardHighlightX + 1)
+            sounds['select']:play()
+        end
 
-            local tempX, tempY = tile2.x, tile2.y
-            local tempgridX, tempgridY = tile2.gridX, tile2.gridY
+        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+            local x = self.boardHighlightX + 1
+            local y = self.boardHighlightY + 1
+            
+            if not self.highlightedTile then
+                self.highlightedTile = self.board.tiles[y][x]
+            elseif self.highlightedTile == self.board.tiles[y][x] then
+                self.highlightedTile = nil
+            elseif math.abs(self.highlightedTile.gridX - x) + math.abs(self.highlightedTile.gridY - y) > 1 then
+                sounds['error']:play()
+                self.highlightedTile = nil
+            else
+                local tempX = self.highlightedTile.gridX
+                local tempY = self.highlightedTile.gridY
 
-            local tempTile = tile1
-            board[tile1.gridY][tile1.gridX] = tile2
-            board[tile2.gridY][tile2.gridX] = tempTile
+                local newTile = self.board.tiles[y][x]
 
-            Timer.tween(0.2, {
-                [tile2] = {x = tile1.x, y = tile1.y},
-                [tile1] = {x = tempX, y = tempY}
-            })
+                self.highlightedTile.gridX = newTile.gridX
+                self.highlightedTile.gridY = newTile.gridY
+                newTile.gridX = tempX
+                newTile.gridY = tempY
+                
+                Timer.tween(0.1, {
+                    [self.highlightedTile] = {x = newTile.x, y = newTile.y},
+                    [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
+                })
 
-            tile2.x, tile2.y = tile1.x, tile1.y
-            tile2.gridX, tile2.gridY = tile1.gridX, tile1.gridY
-            tile1.x, tile1.y = tempX, tempY
-            tile1.gridX, tile1.gridY = tempgridX, tempgridY
+                self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
+                    self.highlightedTile
+                self.board.tiles[newTile.gridY][newTile.gridX] = newTile
+                self.highlightedTile = nil
 
-            highlightedTile = false
-
-            selectedTile = tile2
+            end
         end
     end
+    Timer.update(dt)
 end
 
 function PlayState:draw()
     self.board:draw()
+
+    if self.highlightedTile then
+        love.graphics.setBlendMode('add')
+
+        love.graphics.setColor(1, 1, 1, 0.35)
+        love.graphics.rectangle('fill', (self.highlightedTile.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272),
+            (self.highlightedTile.gridY - 1) * 32 + 16, 32, 32, 4)
+
+        love.graphics.setBlendMode('alpha')
+    end
+
+    if self.rectHighlighted then
+        love.graphics.setColor(0.85, 0.35, 0.4, 1)
+    else
+        love.graphics.setColor(0.65, 0.2, 0.2, 1)
+    end
+
+    love.graphics.setLineWidth(4)
+    love.graphics.rectangle('line', self.boardHighlightX * 32 + (VIRTUAL_WIDTH - 272),
+        self.boardHighlightY * 32 + 16, 32, 32, 4)
 end
