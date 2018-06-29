@@ -8,7 +8,8 @@ function BeginGameState:init()
     self.levelLabelY = -64
 end
 
-function BeginGameState:enter()
+function BeginGameState:enter(params)
+    self.level = params.level
     Timer.tween(1, {
         [self] = {transitionAlpha = 0}
     })
@@ -22,7 +23,10 @@ function BeginGameState:enter()
                     [self] = {levelLabelY = VIRTUAL_HEIGHT + 30}
                 })
                 :finish(function()
-                    stateMachine:change('play')
+                    stateMachine:change('play', {
+                        level = self.level,
+                        board = self.board
+                    })
                 end)
             end)
         end)

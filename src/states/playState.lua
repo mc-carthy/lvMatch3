@@ -56,6 +56,13 @@ function PlayState:init()
     selectedTile = board[1][1]
 end
 
+function PlayState:enter(params)
+    self.level = params.level
+    self.board = params.board or Board(VIRTUAL_WIDTH - 272, 16)
+    self.score = params.score or 0
+    self.scoreGoal = self.level * 1.25 * 1000
+end
+
 function PlayState:update(dt)
     local x, y = selectedTile.gridX, selectedTile.gridY
     
@@ -110,5 +117,5 @@ function PlayState:update(dt)
 end
 
 function PlayState:draw()
-    drawBoard((VIRTUAL_WIDTH - (TILE_SIZE * GRID_X_SIZE)) / 2, (VIRTUAL_HEIGHT - (TILE_SIZE * GRID_Y_SIZE)) / 2)
+    self.board:draw()
 end

@@ -55,7 +55,9 @@ function StartState:update(dt)
                 Timer.tween(1, {
                     [self] = {transitionAlpha = 255}
                 }):finish(function()
-                    stateMachine:change('beginGame')
+                    stateMachine:change('beginGame', {
+                        level = 1
+                    })
                     self.colorTimer:remove()
                 end)
             else
