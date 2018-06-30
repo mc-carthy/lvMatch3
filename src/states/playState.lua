@@ -53,7 +53,7 @@ function PlayState:init()
     self.canInput = true
     self.highlightedTile = nil
     self.score = 0
-    self.timer = 10
+    self.timer = 60
 
     Timer.every(0.5, function()
         self.rectHighlighted = not self.rectHighlighted
@@ -110,6 +110,17 @@ function PlayState:update(dt)
         sounds['gameOver']:play()
 
         stateMachine:change('gameOver', {
+            score = self.score
+        })
+    end
+
+    if self.score >= self.scoreGoal then
+        Timer.clear()
+
+        sounds['nextLevel']:play()
+
+        stateMachine:change('beginGame', {
+            level = self.level + 1,
             score = self.score
         })
     end
