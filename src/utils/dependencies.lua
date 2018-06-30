@@ -10,6 +10,7 @@ require('src.states.baseState')
 require('src.states.startState')
 require('src.states.playState')
 require('src.states.beginGameState')
+require('src.states.gameOverState')
 
 sounds = {
     ['music'] = love.audio.newSource('assets/audio/music3.mp3', 'static'),
@@ -17,8 +18,8 @@ sounds = {
     ['error'] = love.audio.newSource('assets/audio/error.wav', 'static'),
     ['match'] = love.audio.newSource('assets/audio/match.wav', 'static'),
     ['clock'] = love.audio.newSource('assets/audio/clock.wav', 'static'),
-    ['game-over'] = love.audio.newSource('assets/audio/game-over.wav', 'static'),
-    ['next-level'] = love.audio.newSource('assets/audio/next-level.wav', 'static')
+    ['gameOver'] = love.audio.newSource('assets/audio/game-over.wav', 'static'),
+    ['nextLevel'] = love.audio.newSource('assets/audio/next-level.wav', 'static')
 }
 
 fonts = {

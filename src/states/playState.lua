@@ -53,7 +53,7 @@ function PlayState:init()
     self.canInput = true
     self.highlightedTile = nil
     self.score = 0
-    self.timer = 60
+    self.timer = 10
 
     Timer.every(0.5, function()
         self.rectHighlighted = not self.rectHighlighted
@@ -102,6 +102,16 @@ end
 function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
+    end
+
+    if self.timer <= 0 then
+        Timer.clear()
+        
+        sounds['gameOver']:play()
+
+        stateMachine:change('gameOver', {
+            score = self.score
+        })
     end
 
     if self.canInput then
