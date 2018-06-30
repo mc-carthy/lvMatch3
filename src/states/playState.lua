@@ -85,6 +85,7 @@ function PlayState:calculateMatches()
 
         for k, match in pairs(matches) do
             self.score = self.score + #match * 50
+            self.timer = self.timer + #match * 50 * TIME_SCORE_PROPORTION
         end
 
         self.board:removeMatches()
@@ -121,7 +122,8 @@ function PlayState:update(dt)
 
         stateMachine:change('beginGame', {
             level = self.level + 1,
-            score = self.score
+            score = self.score,
+            timer = self.timer
         })
     end
 
